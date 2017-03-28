@@ -169,8 +169,6 @@ class DataJsonController(BaseController):
                 # None, {'limit': 50, 'page': 300})
                 packages = DataJsonController._get_ckan_datasets()
                 # packages = p.toolkit.get_action("current_package_list_with_resources")(None, {})
-            tags = []
-            themes = []
             import re
             for i in range(0, len(packages)):
                 j = 0
@@ -203,11 +201,10 @@ class DataJsonController(BaseController):
                         packages[i]['resources'][0]['url']).group(0)
                 except Exception:
                     pass
-                try:
-                    for theme in packages[i]['groups']:
-                        themes.append(theme['title'])
-                except KeyError:
-                    pass
+
+                themes = self.safely_map(dict.get, packages[i]['groups'], 'title')
+                packages[i]['groups'] = themes
+
                 try:
                     packages[i]['author'] = {
                         'name': packages[i]['author'],
@@ -216,14 +213,10 @@ class DataJsonController(BaseController):
                 except KeyError:
                     pass
 
-                try:
-                    for tag in packages[i]['tags']:
-                        tags.append(tag['display_name'])
-                except KeyError:
-                    pass
-                # packages[i] = json.loads(packages[i][0]['extras']['language'])
-                packages[i]['groups'] = themes
+                tags = self.safely_map(dict.get, packages[i]['tags'], 'display_name')
                 packages[i]['tags'] = tags
+
+                # packages[i] = json.loads(packages[i][0]['extras']['language'])
                 try:
                     if len(packages[i]['url']) < 1:
                         packages[i]['url'] = '{host}/dataset/{dataset_id}'.format(
@@ -301,6 +294,15 @@ class DataJsonController(BaseController):
             return data
 
         return self.write_zip(data, error, errors_json, zip_name=export_type)
+
+    def safely_map(self, function, list, *args):
+        array = []
+        for element in list:
+            try:
+                array.append(function(element, *args))
+            except:
+                pass
+        return [x for x in array if x is not None]
 
     def get_packages(self, owner_org, with_private=True):
         # Build the data.json file.
