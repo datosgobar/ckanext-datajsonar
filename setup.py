@@ -23,10 +23,10 @@ setup(
 		# -*- Extra requirements: -*-
 	],
 	entry_points=\
-	"""
-        [ckan.plugins]
-    datajson=ckanext.datajson:DataJsonPlugin
-	datajson_harvest=ckanext.datajson:DataJsonHarvester
-	cmsdatanav_harvest=ckanext.datajson:CmsDataNavigatorHarvester
-	""",
+	'''
+	[ckan.plugins]
+    datajson=ckanext.datajson.plugin:DataJsonPlugin
+	datajson_harvest=ckanext.datajson.harvester_datajson:DataJsonHarvester
+	cmsdatanav_harvest=ckanext.datajson.harvester_cmsdatanavigator:CmsDataNavigatorHarvester
+	''',
 )
