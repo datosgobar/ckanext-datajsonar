@@ -187,7 +187,7 @@ class DataJsonController(BaseController):
                             fixed_attrDesc = json.loads(resource['attributesDescription'])
                             packages[i]['resources'][index]['attributesDescription'] = fixed_attrDesc
                         except ValueError:
-                            logger.error('Fallo rendere de \'attributesDescription\'.')
+                            logger.error('Fallo render de \'attributesDescription\'.')
                 except KeyError:
                     pass
                 try:
