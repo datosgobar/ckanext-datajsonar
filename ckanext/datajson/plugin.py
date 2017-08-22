@@ -188,10 +188,10 @@ class DataJsonController(BaseController):
                 except KeyError:
                     pass
                 try:
-                    for j in range(0, len(packages[i]['resources'])):
-                        accessURL = packages[i]['resources'][j]['url']
+                    for index, resource in enumerate(packages[i]['resources']):
+                        accessURL = resource['url']
                         accessURL = accessURL.split('download')[0].replace('/resource/', '/archivo/')
-                        packages[i]['resources'][j].update({'accessURL': accessURL[:-1]})
+                        packages[i]['resources'][index].update({'accessURL': accessURL[:-1]})
                 except KeyError:
                     pass
                 ckan_host = ''
