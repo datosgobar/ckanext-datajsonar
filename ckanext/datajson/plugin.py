@@ -2,7 +2,6 @@ import logging
 import StringIO
 import json
 import sys
-
 import ckan.plugins as p
 from ckan.lib.base import BaseController, render, c
 from pylons import request, response
@@ -10,11 +9,10 @@ import re
 import ckan.model as model
 import os
 import ckan.lib.dictization.model_dictize as model_dictize
-
 from jsonschema.exceptions import best_match
-
 from helpers import get_export_map_json, detect_publisher, get_validator
 from package2pod import Package2Pod
+from ckan.config.environment import config
 
 logger = logging.getLogger('datajson')
 draft4validator = get_validator()
@@ -187,11 +185,17 @@ class DataJsonController(BaseController):
                         packages[i]['resources'][j]['attributesDescription'] = fixed_attrDesc
                 except KeyError:
                     pass
+                # Obtengo el ckan.site_url para chequear la propiedad del recurso.
+                ckan_site_url = config.get('ckan.site_url')
                 try:
-                    for j in range(0, len(packages[i]['resources'])):
-                        accessURL = packages[i]['resources'][j]['url']
-                        accessURL = accessURL.split('download')[0].replace('/resource/', '/archivo/')
-                        packages[i]['resources'][j].update({'accessURL': accessURL[:-1]})
+                    for index, resource in enumerate(packages[i]['resources']):
+                        accessURL = resource['url']
+                        if ckan_site_url in accessURL:
+                            accessURL = accessURL.split('download')[0].replace('/resource/', '/archivo/')
+                            packages[i]['resources'][index].update({'accessURL': accessURL[:-1]})
+                        else:
+                            logger.warning('El dataset \'{}\' no es propio de \'{}\', por tanto no es posible renderizar '
+                                           'el campo accessURL'.format(packages[i].get('title'), ckan_site_url))
                 except KeyError:
                     pass
                 ckan_host = ''
