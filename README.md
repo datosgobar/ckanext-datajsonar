@@ -94,7 +94,7 @@ El presente desarrollo es un fork del trabajo de la [GSA](link), [GSA/ckanext-da
 
 Contacto:
 ---
-Este proyecto es en desarrollo, si viste algun `bug`, por favor, [creanos un issue](https://github.com/datosgobar/ckanext-datajsonAR/issues/new?title=Encontre un bug!).
+Este proyecto es en desarrollo, si viste algun `bug`, por favor, [creanos un issue](https://github.com/datosgobar/ckanext-datajsonAR/issues/new).
 
 Comentarios o preguntas?
 ---
