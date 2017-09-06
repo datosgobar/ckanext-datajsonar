@@ -182,9 +182,12 @@ class DataJsonController(BaseController):
                         packages[i]['extras'][j]['value'] = json.loads(extra['value'])
                     j += 1
                 try:
-                    for j in range(0, len(packages[i]['resources'])):
-                        fixed_attrDesc = json.loads(packages[i]['resources'][j]['attributesDescription'])
-                        packages[i]['resources'][j]['attributesDescription'] = fixed_attrDesc
+                    for index, resource in enumerate(packages[i]['resources']):
+                        try:
+                            fixed_attrDesc = json.loads(resource['attributesDescription'])
+                            packages[i]['resources'][index]['attributesDescription'] = fixed_attrDesc
+                        except ValueError:
+                            logger.error('Fallo render de \'attributesDescription\'.')
                 except KeyError:
                     pass
                 try:
