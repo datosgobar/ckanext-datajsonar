@@ -174,6 +174,7 @@ class DataJsonController(BaseController):
                 j = 0
                 for extra in packages[i]['extras']:
                     if extra.get('key') == 'language':
+                        print 'Key: {}, Value: {}'.format(extra.get('key'), extra.get('value'))
                         if not isinstance(extra.get('value'), (unicode, str)):
                             # Solo puedo operar si value es una instancia de UNICODE o STR
                             logger.warn('No fue posible renderizar el campo: \"Language\".')
@@ -185,7 +186,6 @@ class DataJsonController(BaseController):
                                 language = json.loads(extra['value'])
                             except ValueError:
                                 # La traduccion no es posible, limpiar y reintentar
-                                lang = []
                                 if "{" or "}" in extra.get('value'):
                                     lang = [extra['value'].replace('{', '').replace('}', '').split(','), ]
                                 else:
