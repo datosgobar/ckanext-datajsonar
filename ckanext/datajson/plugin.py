@@ -173,11 +173,37 @@ class DataJsonController(BaseController):
             for i in range(0, len(packages)):
                 j = 0
                 for extra in packages[i]['extras']:
-                    if extra['key'] == 'language':
-                        if "{" in extra['value'] and "}" in extra['value'] or len(extra['value']) == 3:
-                            extra['value'] = "[\"{0}\"]".format(extra['value'].replace('{', '').replace('}', ''))
-                        packages[i]['extras'][j]['value'] = json.loads(extra['value'])
+                    if extra.get('key') == 'language':
+                        if not isinstance(extra.get('value'), (unicode, str)):
+                            # Solo puedo operar si value es una instancia de UNICODE o STR
+                            logger.warn('No fue posible renderizar el campo: \"Language\".')
+                        else:
+                            language = []
+                            try:
+                                # intento convertir directamente el valor de
+                                # Language a una lista.
+                                language = json.loads(extra['value'])
+                            except ValueError:
+                                # La traduccion no es posible, limpiar y reintentar
+                                lang = "[]"
+                                if "{" or "}" in extra.get('value'):
+                                    lang = "[\"{0}\"]".format(extra['value'].replace('{', '').replace('}', ''))
+                                language = json.loads(lang)
+
+                            packages[i]['extras'][j]['value'] = language
+
+                        # try:
+                        #     language = json.loads(extra.get('value'))
+                        # except ValueError:
+                        #     #
+                        # print ">>>", extra.get('value', '')
+                        #
+                        # if "{" in extra['value'] and "}" in extra['value'] or len(extra['value']) == 3:
+                        #     extra['value'] = "[\"{0}\"]".format(extra['value'].replace('{', '').replace('}', ''))
+                        # elif "" or "" in extra.get('value'):
+                        #
                         # packages[i]['extras'][j]['value'] = json.loads(extra['value'])
+
                     elif extra['key'] == 'globalGroups':
                         packages[i]['extras'][j]['value'] = json.loads(extra['value'])
                     j += 1
