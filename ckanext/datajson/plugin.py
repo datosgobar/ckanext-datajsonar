@@ -187,7 +187,9 @@ class DataJsonController(BaseController):
                                 # La traduccion no es posible, limpiar y reintentar
                                 lang = "[]"
                                 if "{" or "}" in extra.get('value'):
-                                    lang = "[\"{0}\"]".format(extra['value'].replace('{', '').replace('}', ''))
+                                    lang = "[\"{0}\"]".format(extra['value'].replace('{', '').replace('}', '').split(','))
+                                else:
+                                    lang = [lang.split(',')]
                                 language = json.loads(lang)
 
                             packages[i]['extras'][j]['value'] = language
