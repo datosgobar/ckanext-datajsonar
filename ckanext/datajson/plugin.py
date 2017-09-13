@@ -187,9 +187,13 @@ class DataJsonController(BaseController):
                             except ValueError:
                                 # La traduccion no es posible, limpiar y reintentar
                                 if "{" or "}" in extra.get('value'):
-                                    lang = [extra['value'].replace('{', '').replace('}', '').split(','), ]
+                                    lang = extra['value'].replace('{', '').replace('}', '').split(',')
                                 else:
-                                    lang = [extra.get('value'), ]
+                                    lang = extra.get('value')
+                                if ',' in lang:
+                                    lang = lang.split(',')
+                                else:
+                                    lang = [lang]
                                 language = json.loads(lang)
                             packages[i]['extras'][j]['value'] = language
                     elif extra['key'] == 'globalGroups':
