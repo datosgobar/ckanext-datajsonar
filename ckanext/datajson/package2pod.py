@@ -30,7 +30,7 @@ class Package2Pod:
             try:
                 ckan_owner = gobar_helpers.get_theme_config("title.site-organization", "")
             except Exception:
-                log.debug(u"No se pudo obtener la ocnfiguración de 'title.site-organization'")
+                log.debug(u"No se pudo obtener la configuración de 'title.site-organization'")
             site_description = gobar_helpers.get_theme_config("title.site-description", "")
         except AttributeError:
             # Esto significa que no estoy corriendo dentro de Andino.
