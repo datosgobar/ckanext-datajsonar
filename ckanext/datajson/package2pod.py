@@ -26,6 +26,11 @@ class Package2Pod:
         try:
             site_title = gobar_helpers.get_theme_config("title.site-title", "")
             mbox = gobar_helpers.get_theme_config("social.mail", "")
+            ckan_owner = ''
+            try:
+                ckan_owner = gobar_helpers.get_theme_config("title.site-organization", "")
+            except Exception:
+                log.debug(u"No se pudo obtener la ocnfiguración de 'title.site-organization'")
             site_description = gobar_helpers.get_theme_config("title.site-description", "")
         except AttributeError:
             # Esto significa que no estoy corriendo dentro de Andino.
@@ -51,13 +56,13 @@ class Package2Pod:
         my_themes = []
         from os import path, environ
         from ConfigParser import ConfigParser
-        ckan_owner = ''
         if 'CKAN_CONFIG' in environ:
             if path.exists(environ['CKAN_CONFIG']):
                 tmp_ckan_config = ConfigParser()
                 tmp_ckan_config.read(environ['CKAN_CONFIG'])
                 try:
-                    ckan_owner = tmp_ckan_config.get('app:main', 'ckan.owner')
+                    if len(tmp_ckan_config.get('app:main', 'ckan.owner')) > 0:
+                        ckan_owner = tmp_ckan_config.get('app:main', 'ckan.owner')
                 except Exception:
                     pass
                 try:
