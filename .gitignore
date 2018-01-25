@@ -3,5 +3,5 @@ build
 ckanext_datajson.egg-info
 .DS_Store
 /.idea/
-/.code/
+/.vscode/
 
