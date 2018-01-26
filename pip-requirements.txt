@@ -2,3 +2,4 @@ pyyaml
 lepl
 jsonschema
 rfc3987
+pydatajson<0.4
