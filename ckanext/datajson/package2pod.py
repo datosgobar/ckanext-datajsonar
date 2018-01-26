@@ -431,9 +431,6 @@ class Wrappers:
                 email = package.get(contact_point_map.get('hasEmail').get('field'),
                                     package.get('maintainer_email'))
 
-            if email and not is_redacted(email) and '@' in email:
-                email = 'mailto:' + email
-
             if Wrappers.redaction_enabled:
                 redaction_reason = get_extra(package, 'redacted_' + contact_point_map.get('hasEmail').get('field'),
                                              False)
@@ -442,7 +439,7 @@ class Wrappers:
             else:
                 email = Package2Pod.filter(email)
 
-            contact_point = OrderedDict([('@type', 'vcard:Contact')])
+            contact_point = OrderedDict()
             # Modify here!
             if fn:
                 contact_point['fn'] = fn
