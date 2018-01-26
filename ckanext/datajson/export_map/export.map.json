@@ -74,6 +74,9 @@
       "distribution": {
         "wrapper": "generate_distribution",
         "map": {
+          "identifier": {
+            "field": "id"
+          },
           "mediaType": {
             "field": "mimetype"
           },
