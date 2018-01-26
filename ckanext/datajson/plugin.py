@@ -2,6 +2,8 @@ import logging
 import StringIO
 import json
 import sys
+import io
+import tempfile
 
 import ckan.plugins as p
 from ckan.lib.base import BaseController, render, c
@@ -12,6 +14,8 @@ import os
 import ckan.lib.dictization.model_dictize as model_dictize
 
 from jsonschema.exceptions import best_match
+
+from pydatajson import DataJson, writers
 
 from helpers import get_export_map_json, detect_publisher, get_validator
 from package2pod import Package2Pod
@@ -44,6 +48,9 @@ class DataJsonPlugin(p.SingletonPlugin):
         DataJsonPlugin.ld_title = config.get("ckan.site_title", "Catalog")
         DataJsonPlugin.site_url = config.get("ckan.site_url")
 
+        DataJsonPlugin.absolute_route_path = DataJsonPlugin.site_url + DataJsonPlugin.route_path
+        DataJsonPlugin.xlsx_route_path = config.get("ckanext.datajson.xlsx_path", "/catalog.xlsx")
+
         DataJsonPlugin.inventory_links_enabled = config.get("ckanext.datajson.inventory_links_enabled",
                                                             "False") == 'True'
 
@@ -59,6 +66,10 @@ class DataJsonPlugin(p.SingletonPlugin):
             # /data.json and /data.jsonld (or other path as configured by user)
             m.connect('datajson_export', DataJsonPlugin.route_path,
                       controller='ckanext.datajson.plugin:DataJsonController', action='generate_json')
+
+            m.connect('xlsx_export', DataJsonPlugin.xlsx_route_path,
+                    controller='ckanext.datajson.plugin:DataJsonController', action='generate_xlsx')
+
             m.connect('organization_export', '/organization/{org_id}/data.json',
                       controller='ckanext.datajson.plugin:DataJsonController', action='generate_org_json')
             # TODO commenting out enterprise data inventory for right now
@@ -105,6 +116,33 @@ class DataJsonController(BaseController):
 
     def generate_draft(self, org_id):
         return self.generate('draft', org_id=org_id)
+
+
+    def generate_xlsx(self, *args, **kwargs):
+        file_name = os.path.join(tempfile.mkdtemp(), DataJsonPlugin.xlsx_route_path)
+        
+        try:
+            catalog = DataJson(DataJsonPlugin.absolute_route_path)
+            writers.write_xlsx_catalog(catalog, file_name)
+
+            with io.BytesIO() as stream:
+                with open(file_name, 'rb') as file_handle:
+                    stream.write(file_handle.read())
+
+                response.content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+                # allow caching of response (e.g. by Apache)
+                del response.headers["Cache-Control"]
+                del response.headers["Pragma"]
+
+                return stream.getvalue()
+        finally:
+            # Let's delete the file
+            try:
+                os.remove(file_name)
+            except OSError:
+                pass
+
 
     def generate(self, export_type='datajson', org_id=None):
         if export_type in ['draft', 'redacted', 'unredacted']:
