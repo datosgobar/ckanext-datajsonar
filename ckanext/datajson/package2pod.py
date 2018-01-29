@@ -226,7 +226,7 @@ class Package2Pod:
                 for dist in dataset['distribution']:
                     del dist['@type']
             except KeyError:
-                log.info("Contenido de distribution: %s", unicode(dist))
+                log.info("Dataset {} no posee distribuciones", dataset['id'])
 
             return dataset
         except Exception as e:
