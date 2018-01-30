@@ -2,6 +2,9 @@ import logging
 import StringIO
 import json
 import sys
+import io
+import tempfile
+
 import ckan.plugins as p
 from ckan.lib.base import BaseController, render, c
 from pylons import request, response
@@ -10,6 +13,9 @@ import ckan.model as model
 import os
 import ckan.lib.dictization.model_dictize as model_dictize
 from jsonschema.exceptions import best_match
+
+from pydatajson import DataJson, writers
+
 from helpers import get_export_map_json, detect_publisher, get_validator
 from package2pod import Package2Pod
 from ckan.config.environment import config
@@ -42,6 +48,9 @@ class DataJsonPlugin(p.SingletonPlugin):
         DataJsonPlugin.ld_title = config.get("ckan.site_title", "Catalog")
         DataJsonPlugin.site_url = config.get("ckan.site_url")
 
+        DataJsonPlugin.absolute_route_path = DataJsonPlugin.site_url + DataJsonPlugin.route_path
+        DataJsonPlugin.xlsx_route_path = config.get("ckanext.datajson.xlsx_path", "/catalog.xlsx")
+
         DataJsonPlugin.inventory_links_enabled = config.get("ckanext.datajson.inventory_links_enabled",
                                                             "False") == 'True'
 
@@ -57,6 +66,10 @@ class DataJsonPlugin(p.SingletonPlugin):
             # /data.json and /data.jsonld (or other path as configured by user)
             m.connect('datajson_export', DataJsonPlugin.route_path,
                       controller='ckanext.datajson.plugin:DataJsonController', action='generate_json')
+
+            m.connect('xlsx_export', DataJsonPlugin.xlsx_route_path,
+                    controller='ckanext.datajson.plugin:DataJsonController', action='generate_xlsx')
+
             m.connect('organization_export', '/organization/{org_id}/data.json',
                       controller='ckanext.datajson.plugin:DataJsonController', action='generate_org_json')
             # TODO commenting out enterprise data inventory for right now
@@ -103,6 +116,33 @@ class DataJsonController(BaseController):
 
     def generate_draft(self, org_id):
         return self.generate('draft', org_id=org_id)
+
+
+    def generate_xlsx(self, *args, **kwargs):
+        file_name = os.path.join(tempfile.mkdtemp(), DataJsonPlugin.xlsx_route_path)
+        
+        try:
+            catalog = DataJson(DataJsonPlugin.absolute_route_path)
+            writers.write_xlsx_catalog(catalog, file_name)
+
+            with io.BytesIO() as stream:
+                with open(file_name, 'rb') as file_handle:
+                    stream.write(file_handle.read())
+
+                response.content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+                # allow caching of response (e.g. by Apache)
+                del response.headers["Cache-Control"]
+                del response.headers["Pragma"]
+
+                return stream.getvalue()
+        finally:
+            # Let's delete the file
+            try:
+                os.remove(file_name)
+            except OSError:
+                pass
+
 
     def generate(self, export_type='datajson', org_id=None):
         if export_type in ['draft', 'redacted', 'unredacted']:
@@ -171,18 +211,39 @@ class DataJsonController(BaseController):
             for i in range(0, len(packages)):
                 j = 0
                 for extra in packages[i]['extras']:
-                    if extra['key'] == 'language':
-                        if "{" in extra['value'] and "}" in extra['value'] or len(extra['value']) == 3:
-                            extra['value'] = "[\"{0}\"]".format(extra['value'].replace('{', '').replace('}', ''))
-                        packages[i]['extras'][j]['value'] = json.loads(extra['value'])
-                        # packages[i]['extras'][j]['value'] = json.loads(extra['value'])
+                    if extra.get('key') == 'language':
+                        print 'Key: {}, Value: {}'.format(extra.get('key'), extra.get('value'))
+                        if not isinstance(extra.get('value'), (unicode, str)):
+                            # Solo puedo operar si value es una instancia de UNICODE o STR
+                            logger.warn('No fue posible renderizar el campo: \"Language\".')
+                        else:
+                            language = []
+                            try:
+                                # intento convertir directamente el valor de
+                                # Language a una lista.
+                                language = json.loads(extra['value'])
+                            except ValueError:
+                                # La traduccion no es posible, limpiar y reintentar
+                                if "{" or "}" in extra.get('value'):
+                                    lang = extra['value'].replace('{', '').replace('}', '').split(',')
+                                else:
+                                    lang = extra.get('value')
+                                if ',' in lang:
+                                    lang = lang.split(',')
+                                else:
+                                    lang = [lang]
+                                language = json.loads(lang)
+                            packages[i]['extras'][j]['value'] = language
                     elif extra['key'] == 'globalGroups':
                         packages[i]['extras'][j]['value'] = json.loads(extra['value'])
                     j += 1
                 try:
-                    for j in range(0, len(packages[i]['resources'])):
-                        fixed_attrDesc = json.loads(packages[i]['resources'][j]['attributesDescription'])
-                        packages[i]['resources'][j]['attributesDescription'] = fixed_attrDesc
+                    for index, resource in enumerate(packages[i]['resources']):
+                        try:
+                            fixed_attrDesc = json.loads(resource['attributesDescription'])
+                            packages[i]['resources'][index]['attributesDescription'] = fixed_attrDesc
+                        except ValueError:
+                            logger.error('Fallo render de \'attributesDescription\'.')
                 except KeyError:
                     pass
                 # Obtengo el ckan.site_url para chequear la propiedad del recurso.

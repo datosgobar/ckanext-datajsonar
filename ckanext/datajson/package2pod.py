@@ -26,6 +26,11 @@ class Package2Pod:
         try:
             site_title = gobar_helpers.get_theme_config("title.site-title", "")
             mbox = gobar_helpers.get_theme_config("social.mail", "")
+            ckan_owner = ''
+            try:
+                ckan_owner = gobar_helpers.get_theme_config("title.site-organization", "")
+            except Exception:
+                log.debug(u"No se pudo obtener la configuración de 'title.site-organization'")
             site_description = gobar_helpers.get_theme_config("title.site-description", "")
         except AttributeError:
             # Esto significa que no estoy corriendo dentro de Andino.
@@ -51,13 +56,13 @@ class Package2Pod:
         my_themes = []
         from os import path, environ
         from ConfigParser import ConfigParser
-        ckan_owner = ''
         if 'CKAN_CONFIG' in environ:
             if path.exists(environ['CKAN_CONFIG']):
                 tmp_ckan_config = ConfigParser()
                 tmp_ckan_config.read(environ['CKAN_CONFIG'])
                 try:
-                    ckan_owner = tmp_ckan_config.get('app:main', 'ckan.owner')
+                    if len(tmp_ckan_config.get('app:main', 'ckan.owner')) > 0:
+                        ckan_owner = tmp_ckan_config.get('app:main', 'ckan.owner')
                 except Exception:
                     pass
                 try:
@@ -221,7 +226,7 @@ class Package2Pod:
                 for dist in dataset['distribution']:
                     del dist['@type']
             except KeyError:
-                log.info("Contenido de distribution: %s", unicode(dist))
+                log.info("Dataset %s no posee distribuciones", dataset['identifier'])
 
             return dataset
         except Exception as e:
@@ -426,9 +431,6 @@ class Wrappers:
                 email = package.get(contact_point_map.get('hasEmail').get('field'),
                                     package.get('maintainer_email'))
 
-            if email and not is_redacted(email) and '@' in email:
-                email = 'mailto:' + email
-
             if Wrappers.redaction_enabled:
                 redaction_reason = get_extra(package, 'redacted_' + contact_point_map.get('hasEmail').get('field'),
                                              False)
@@ -437,7 +439,7 @@ class Wrappers:
             else:
                 email = Package2Pod.filter(email)
 
-            contact_point = OrderedDict([('@type', 'vcard:Contact')])
+            contact_point = OrderedDict()
             # Modify here!
             if fn:
                 contact_point['fn'] = fn

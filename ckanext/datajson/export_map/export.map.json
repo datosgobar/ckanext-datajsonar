@@ -60,11 +60,23 @@
       "publisher": {
         "field": "author"
       },
-
-
+      "contactPoint": {
+        "wrapper": "build_contact_point",
+        "map": {
+          "fn": {
+            "field": "maintainer"
+          },
+          "hasEmail": {
+            "field": "maintainer_email"
+          }
+        }
+      },
       "distribution": {
         "wrapper": "generate_distribution",
         "map": {
+          "identifier": {
+            "field": "id"
+          },
           "mediaType": {
             "field": "mimetype"
           },
@@ -143,3 +155,4 @@
       }
     }
   }
+  
