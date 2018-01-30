@@ -49,7 +49,8 @@ class DataJsonPlugin(p.SingletonPlugin):
         DataJsonPlugin.site_url = config.get("ckan.site_url")
 
         DataJsonPlugin.absolute_route_path = DataJsonPlugin.site_url + DataJsonPlugin.route_path
-        DataJsonPlugin.xlsx_route_path = config.get("ckanext.datajson.xlsx_path", "/catalog.xlsx")
+        DataJsonPlugin.xlsx_file_name = config.get("ckanext.datajson.xlsx_file_name", "catalog.xlsx")
+        DataJsonPlugin.xlsx_route_path = config.get("ckanext.datajson.xlsx_path", "/%s" % DataJsonPlugin.xlsx_file_name)
 
         DataJsonPlugin.inventory_links_enabled = config.get("ckanext.datajson.inventory_links_enabled",
                                                             "False") == 'True'
@@ -119,7 +120,7 @@ class DataJsonController(BaseController):
 
 
     def generate_xlsx(self, *args, **kwargs):
-        file_name = os.path.join(tempfile.mkdtemp(), DataJsonPlugin.xlsx_route_path)
+        file_name = os.path.join(tempfile.mkdtemp(), DataJsonPlugin.xlsx_file_name)
         
         try:
             catalog = DataJson(DataJsonPlugin.absolute_route_path)
