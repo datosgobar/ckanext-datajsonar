@@ -24,8 +24,23 @@ class Package2Pod:
         andino_platform = True
         import ckanext.gobar_theme.helpers as gobar_helpers
         try:
+            version = gobar_helpers.portal_andino_version()
             site_title = gobar_helpers.get_theme_config("title.site-title", "")
             mbox = gobar_helpers.get_theme_config("social.mail", "")
+            modified_date = gobar_helpers.get_theme_config("portal-metadata.last_updated", "")
+            homepage = gobar_helpers.get_theme_config("portal-metadata.homepage", "")
+            identifier = gobar_helpers.get_theme_config("portal-metadata.id", "")
+            issued = gobar_helpers.get_theme_config("portal-metadata.launch_date", "")
+            language = gobar_helpers.get_theme_config("portal-metadata.language", "")
+            license_metadata = gobar_helpers.get_theme_config("portal-metadata.license", "")
+            rights = gobar_helpers.get_theme_config("portal-metadata.licence_conditions", "")
+            country = gobar_helpers.get_theme_config("portal-metadata.country", "")
+            if country == 'Arg':
+                province = gobar_helpers.get_theme_config("portal-metadata.province", "")
+                municipio = gobar_helpers.get_theme_config("portal-metadata.municipio", "")
+                spatial = {'country': country, 'province': province, 'municipio': municipio}
+            else:
+                spatial = {'country': country}
             ckan_owner = ''
             try:
                 ckan_owner = gobar_helpers.get_theme_config("title.site-organization", "")
@@ -90,9 +105,17 @@ class Package2Pod:
                            ("description", site_description),
                            ("superThemeTaxonomy", superThemeTaxonomy),
                            ("publisher", {"name": ckan_owner,
-                                          "mbox": mbox}),
-                           ("themeTaxonomy", my_themes)]
-        # catalog_headers = [(x, y) for x, y in json_export_map.get('catalog_headers').iteritems()]
+                                          "mbox": mbox},),
+                           ("themeTaxonomy", my_themes),
+                           ("modified", modified_date),
+                           ("version", version),
+                           ("homepage", homepage),
+                           ("identifier", identifier),
+                           ("issued", issued),
+                           ("language", language),
+                           ("license", license_metadata),
+                           ("rights", rights),
+                           ("spatial", spatial)]
         catalog = OrderedDict(
             catalog_headers + [('dataset', dataset_dict)]
         )
