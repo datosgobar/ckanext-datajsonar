@@ -89,6 +89,9 @@
           "description": {
             "field": "description"
           },
+          "fileName": {
+            "field": "fileName"
+          },
           "conformsTo": {
             "field": "conformsTo"
           },
