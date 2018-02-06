@@ -8,6 +8,9 @@ except ImportError:
 
 from logging import getLogger
 
+from urlparse import urlparse
+import os.path
+
 from helpers import *
 
 log = getLogger(__name__)
@@ -519,6 +522,13 @@ class Wrappers:
                         log.warn("Missing mediaType for resource in package ['%s']", package.get('id'))
             else:
                 log.warn("Missing downloadURL for resource in package ['%s']", package.get('id'))
+
+            fileName = r.get('fileName')
+            if not fileName:
+                path = urlparse(res_url).path
+                fileName = os.path.split(path)[1] if '/' in path else path
+
+            resource['fileName'] = fileName
 
             striped_resource = OrderedDict(
                 [(x, y) for x, y in resource.iteritems() if y is not None and y != "" and y != []])
