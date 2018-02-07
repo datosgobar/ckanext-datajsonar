@@ -3,3 +3,4 @@ lepl
 jsonschema
 rfc3987
 pydatajson<0.4
+moment==0.8.2

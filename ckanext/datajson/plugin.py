@@ -30,6 +30,9 @@ except ImportError:
 
 
 class DataJsonPlugin(p.SingletonPlugin):
+    
+    METADATA_VERSION = "1.1"
+
     p.implements(p.interfaces.IConfigurer)
     p.implements(p.interfaces.IRoutes, inherit=True)
 
