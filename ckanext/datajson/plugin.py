@@ -254,13 +254,9 @@ class DataJsonController(BaseController):
                 ckan_site_url = config.get('ckan.site_url')
                 try:
                     for index, resource in enumerate(packages[i]['resources']):
-                        accessURL = resource['url']
-                        if ckan_site_url in accessURL:
-                            accessURL = accessURL.split('download')[0].replace('/resource/', '/archivo/')
-                            packages[i]['resources'][index].update({'accessURL': accessURL[:-1]})
-                        else:
-                            logger.warning('El dataset \'{}\' no es propio de \'{}\', por tanto no es posible renderizar '
-                                           'el campo accessURL'.format(packages[i].get('title'), ckan_site_url))
+                        accessURL = os.path.join(packages[i]['url'], 'resource', resource['id'])
+                        packages[i]['resources'][index].update({'accessURL': accessURL})
+
                 except KeyError:
                     pass
                 ckan_host = ''
