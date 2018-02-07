@@ -9,6 +9,7 @@ except ImportError:
 from logging import getLogger
 
 from urlparse import urlparse
+import moment
 import os.path
 
 from helpers import *
@@ -26,7 +27,26 @@ class Package2Pod:
     def wrap_json_catalog(dataset_dict, json_export_map):
         andino_platform = True
         import ckanext.gobar_theme.helpers as gobar_helpers
+        from plugin import DataJsonPlugin
         try:
+            version = DataJsonPlugin.METADATA_VERSION
+            identifier = gobar_helpers.get_theme_config("portal-metadata.id", "")
+            issued = gobar_helpers.get_theme_config("portal-metadata.launch_date", "")
+            if issued:
+                issued = moment.date(issued, "%d/%m/%Y").isoformat()
+            last_updated = gobar_helpers.get_theme_config("portal-metadata.last_updated", "")
+            languages = gobar_helpers.get_theme_config("portal-metadata.languages", "")
+            license = gobar_helpers.get_theme_config("portal-metadata.license", "")
+            homepage = gobar_helpers.get_theme_config("portal-metadata.homepage", "")
+            licence_conditions = gobar_helpers.get_theme_config("portal-metadata.licence_conditions", "")
+            
+            spatial = []
+            spatial_config_fields = ['country', 'province', 'districts']
+            for spatial_config_field in spatial_config_fields:
+                spatial_config_field_value = gobar_helpers.get_theme_config("portal-metadata.%s" % spatial_config_field, "")
+                if spatial_config_field_value:
+                    spatial.extend(spatial_config_field_value.split(','))
+
             site_title = gobar_helpers.get_theme_config("title.site-title", "")
             mbox = gobar_helpers.get_theme_config("social.mail", "")
             ckan_owner = ''
@@ -89,12 +109,25 @@ class Package2Pod:
                               'description': theme['description'],
                               'label': theme['display_name']
                               })
-        catalog_headers = [("title", site_title),
-                           ("description", site_description),
-                           ("superThemeTaxonomy", superThemeTaxonomy),
-                           ("publisher", {"name": ckan_owner,
-                                          "mbox": mbox}),
-                           ("themeTaxonomy", my_themes)]
+        catalog_headers = [
+            ("version", version),
+            ("identifier", identifier),
+            ("title", site_title),
+            ("description", site_description),
+            ("superThemeTaxonomy", superThemeTaxonomy),
+            ("publisher", {
+                "name": ckan_owner,
+                "mbox": mbox
+            }),
+            ("issued", issued),
+            ("modified", last_updated),
+            ("language", languages),
+            ("license", license),
+            ("homepage", homepage),
+            ("rights", licence_conditions),
+            ("spatial", spatial),
+            ("themeTaxonomy", my_themes),
+        ]
         # catalog_headers = [(x, y) for x, y in json_export_map.get('catalog_headers').iteritems()]
         catalog = OrderedDict(
             catalog_headers + [('dataset', dataset_dict)]
