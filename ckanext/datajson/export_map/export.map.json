@@ -55,7 +55,9 @@
       },
       "spatial": {
         "extra": true,
-        "field": "Spatial"
+        "field": "Spatial",
+        "type": "array",
+        "split": ","
       },
       "publisher": {
         "field": "author"
