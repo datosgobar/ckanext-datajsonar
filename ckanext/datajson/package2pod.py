@@ -45,7 +45,7 @@ class Package2Pod:
             for spatial_config_field in spatial_config_fields:
                 spatial_config_field_value = gobar_helpers.get_theme_config("portal-metadata.%s" % spatial_config_field, "")
                 if spatial_config_field_value:
-                    spatial.append(spatial_config_field_value)
+                    spatial.extend(spatial_config_field_value.split(','))
 
             site_title = gobar_helpers.get_theme_config("title.site-title", "")
             mbox = gobar_helpers.get_theme_config("social.mail", "")
