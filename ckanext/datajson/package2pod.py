@@ -107,11 +107,11 @@ class Package2Pod:
                     pass
                 if not andino_platform:
                     try:
-                        site_title = tmp_ckan_config.get('app:main', 'ckan.site.title')
+                        site_title = tmp_ckan_config.get('app:main', 'ckan.site.title') or site_title
                     except Exception:
                         site_title = "No definido en \"config.ini\""
                     try:
-                        site_description = tmp_ckan_config.get('app:main', 'ckan.site.description')
+                        site_description = tmp_ckan_config.get('app:main', 'ckan.site.description') or site_description
                     except Exception:
                         site_description = "No definido en \"config.ini\""
 
