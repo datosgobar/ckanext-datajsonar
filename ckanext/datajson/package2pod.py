@@ -28,8 +28,8 @@ class Package2Pod:
         andino_platform = True
         import ckanext.gobar_theme.helpers as gobar_helpers
         from plugin import DataJsonPlugin
+        version = DataJsonPlugin.METADATA_VERSION
         try:
-            version = DataJsonPlugin.METADATA_VERSION
             identifier = gobar_helpers.get_theme_config("portal-metadata.id", "")
             issued = gobar_helpers.get_theme_config("portal-metadata.launch_date", "")
             if issued:
@@ -56,11 +56,22 @@ class Package2Pod:
                 log.debug(u"No se pudo obtener la configuración de 'title.site-organization'")
             site_description = gobar_helpers.get_theme_config("title.site-description", "")
         except AttributeError:
-            # Esto significa que no estoy corriendo dentro de Andino.
+            # Esto significa que no estoy corriendo dentro de Andino, o sea, en datos.gob.ar
+            # FIXME: AttributeError por no tener el get_theme_config? datos.gob.ar debería tener este método.
+            # O al menos detectar mejor si estamos o no en andino
             andino_platform = False
-            site_title = ""
-            mbox = ""
-            site_description = ""
+            site_title = "Datos Argentina"
+            mbox = "datos@modernizacion.gob.ar"
+            site_description = "Catálogo de datos abiertos de la Administración Pública Nacional de Argentina."
+            identifier = "datosgobar"
+            ckan_owner = "Ministerio de Modernización"
+            issued = "2016-03-08"
+            last_updated = "2018-02-20"
+            languages = ["SPA"]
+            license = "Open Database License (ODbL) v1.0"
+            homepage = "http://www.datos.gob.ar"
+            licence_conditions = ""
+            spatial = ["ARG"]
         superThemeTaxonomy = "http://datos.gob.ar/superThemeTaxonomy.json"
         import ckan.logic as logic
         from ckan.common import c
