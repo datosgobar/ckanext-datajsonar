@@ -267,7 +267,7 @@ class DataJsonController(BaseController):
                 except Exception:
                     pass
 
-                themes = self.safely_map(dict.get, packages[i]['groups'], 'id')
+                themes = self.safely_map(dict.get, packages[i]['groups'], 'name')
                 packages[i]['groups'] = themes
 
                 try:
