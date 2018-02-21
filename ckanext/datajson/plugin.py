@@ -254,8 +254,15 @@ class DataJsonController(BaseController):
                 ckan_site_url = config.get('ckan.site_url')
                 try:
                     for index, resource in enumerate(packages[i]['resources']):
-                        accessURL = os.path.join(packages[i]['url'], 'resource', resource['id'])
-                        packages[i]['resources'][index].update({'accessURL': accessURL})
+                        resource = packages[i]['resources'][index]
+                        if not resource.get("accessURL", None):
+                            url = packages[i].get('url', None)
+                            if url:
+                                # Asumimos que la URL recibida es relativa al nodo CKAN al cual el package pertenece
+                                accessURL = os.path.join(url, 'resource', resource['id'])
+                                resource.update({'accessURL': accessURL})
+                            else:
+                                logger.warning("El dataset '{}' no tiene una url definida: '{}'", packages[i]['id'], url)
 
                 except KeyError:
                     pass
