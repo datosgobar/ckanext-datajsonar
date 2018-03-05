@@ -563,9 +563,9 @@ class Wrappers:
                     #    resource.pop('accessURL')
                     resource['downloadURL'] = res_url
                     if 'mediaType' not in resource:
-                        log.warn("Missing mediaType for resource in package ['%s']", package.get('id'))
+                        log.warning("Missing mediaType for resource in package ['%s']", package.get('id'))
             else:
-                log.warn("Missing downloadURL for resource in package ['%s']", package.get('id'))
+                log.warning("Missing downloadURL for resource in package ['%s']", package.get('id'))
 
             fileName = r.get('fileName')
             if not fileName:
