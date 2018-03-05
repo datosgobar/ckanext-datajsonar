@@ -262,7 +262,7 @@ class DataJsonController(BaseController):
                                 accessURL = os.path.join(url, 'resource', resource['id'])
                                 resource.update({'accessURL': accessURL})
                             else:
-                                logger.warning("El dataset '{}' no tiene una url definida: '{}'", packages[i]['id'], url)
+                                logger.warning("El dataset '%s' no tiene una url definida: '%s'", packages[i]['id'], url)
 
                 except KeyError:
                     pass
