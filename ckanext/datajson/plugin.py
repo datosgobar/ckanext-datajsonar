@@ -256,13 +256,8 @@ class DataJsonController(BaseController):
                     for index, resource in enumerate(packages[i]['resources']):
                         resource = packages[i]['resources'][index]
                         if not resource.get("accessURL", None):
-                            url = packages[i].get('url', None)
-                            if url:
-                                # Asumimos que la URL recibida es relativa al nodo CKAN al cual el package pertenece
-                                accessURL = os.path.join(url, 'resource', resource['id'])
-                                resource.update({'accessURL': accessURL})
-                            else:
-                                logger.warning("El dataset '%s' no tiene una url definida: '%s'", packages[i]['id'], url)
+                            accessURL = os.path.join(ckan_site_url, 'resource', resource['id'])
+                            resource.update({'accessURL': accessURL})
 
                 except KeyError:
                     pass
