@@ -256,7 +256,7 @@ class DataJsonController(BaseController):
                     for index, resource in enumerate(packages[i]['resources']):
                         resource = packages[i]['resources'][index]
                         if not resource.get("accessURL", None):
-                            accessURL = os.path.join(ckan_site_url, 'resource', resource['id'])
+                            accessURL = os.path.join(ckan_site_url, 'dataset', packages[i]['id'], 'resource', resource['id'])
                             resource.update({'accessURL': accessURL})
 
                 except KeyError:
