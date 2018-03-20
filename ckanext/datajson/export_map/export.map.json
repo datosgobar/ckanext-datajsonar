@@ -94,6 +94,9 @@
           "fileName": {
             "field": "fileName"
           },
+          "distribution_type": {
+            "field": "resource_type"
+          },
           "conformsTo": {
             "field": "conformsTo"
           },
