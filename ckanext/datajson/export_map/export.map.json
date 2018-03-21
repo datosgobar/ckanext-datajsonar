@@ -62,6 +62,10 @@
       "publisher": {
         "field": "author"
       },
+      "source": {
+        "extra": true,
+        "field": "source"
+      },
       "contactPoint": {
         "wrapper": "build_contact_point",
         "map": {
