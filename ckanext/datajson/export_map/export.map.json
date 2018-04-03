@@ -33,7 +33,12 @@
         "field": "Described by Type"
       },
       "issued": {
-        "field": "metadata_created"
+        "extra": true,
+        "field": "issued"
+      },
+      "modified": {
+        "extra": true,
+        "field": "modified"
       },
       "landingPage": {
         "field": "url"
