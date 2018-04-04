@@ -33,7 +33,12 @@
         "field": "Described by Type"
       },
       "issued": {
-        "field": "metadata_created"
+        "extra": true,
+        "field": "issued"
+      },
+      "modified": {
+        "extra": true,
+        "field": "modified"
       },
       "landingPage": {
         "field": "url"
@@ -114,10 +119,10 @@
             "field": "size"
           },
           "issued": {
-            "field": "created"
+            "field": "issued"
           },
           "modified": {
-            "field": "last_modified"
+            "field": "modified"
           },
           "license": {
             "extra": true,

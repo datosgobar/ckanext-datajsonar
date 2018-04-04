@@ -275,6 +275,11 @@ class Package2Pod:
             except KeyError:
                 log.info("Dataset %s no posee distribuciones", dataset['identifier'])
 
+            if 'modified' not in dataset:
+                dataset['modified'] = package.get('metadata_modified', None)
+            if 'issued' not in dataset:
+                dataset['issued'] = package.get('metadata_created', None)
+
             return dataset
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -573,6 +578,12 @@ class Wrappers:
                 fileName = os.path.split(path)[1] if '/' in path else path
 
             resource['fileName'] = fileName
+
+            # Si el recurso no tiene los campos nuevos de issued y modified, uso el valor interno de CKAN
+            if 'modified' not in resource:
+                resource['modified'] = r.get('last_modified', None)
+            if 'issued' not in resource:
+                resource['issued'] = r.get('created', None)
 
             striped_resource = OrderedDict(
                 [(x, y) for x, y in resource.iteritems() if y is not None and y != "" and y != []])
