@@ -142,18 +142,17 @@
       },
 
       "superTheme": {
-        "extra": true,
-        "field": "globalGroups",
+        "wrapper": "generate_superTheme",
         "type": "array",
         "split": ","
       },
       "temporal": {
         "extra": true,
-        "field": "dateRange"
+        "field": "temporal"
       },
       "accrualPeriodicity": {
         "extra": true,
-        "field": "updateFrequency"
+        "field": "accrualPeriodicity"
       },
       "language": {
         "extra": true,

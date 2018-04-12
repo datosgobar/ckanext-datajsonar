@@ -280,6 +280,11 @@ class Package2Pod:
             if 'issued' not in dataset:
                 dataset['issued'] = package.get('metadata_created', None)
 
+            if 'temporal' not in dataset and get_extra(package, 'dateRange'):
+                dataset['temporal'] = get_extra(package, 'dateRange')  # Uso como default el valor viejo
+            if 'accrualPeriodicity' not in dataset and get_extra(package, 'updateFrequency'):
+                dataset['accrualPeriodicity'] = get_extra(package, 'updateFrequency')  # Uso como default el valor viejo
+
             return dataset
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -442,6 +447,11 @@ class Wrappers:
         'unknown': 'irregular',
         'not updated': 'irregular'
     }
+
+    @staticmethod
+    def generate_superTheme(cls):
+        superTheme = get_extra(Wrappers.pkg, 'superTheme') or get_extra(Wrappers.pkg, 'globalGroups') or '[]'
+        return json.loads(superTheme)
 
     @staticmethod
     def fix_accrual_periodicity(frequency):

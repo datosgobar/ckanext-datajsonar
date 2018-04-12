@@ -238,8 +238,6 @@ class DataJsonController(BaseController):
                                     lang = [lang]
                                 language = json.loads(lang)
                             packages[i]['extras'][j]['value'] = language
-                    elif extra['key'] == 'globalGroups':
-                        packages[i]['extras'][j]['value'] = json.loads(extra['value'])
                     j += 1
                 try:
                     for index, resource in enumerate(packages[i]['resources']):
